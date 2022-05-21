@@ -73,6 +73,13 @@
   }
 }
 
+@mixin circle($radius: 1em) {
+  flex: 0 0;
+  width: $radius * 2;
+  border-radius: 50%;
+  aspect-ratio: 1 / 1;
+}
+
 @mixin scrollbar($color-key: active-color) {
   $color: color.get($color-key);
   scrollbar-width: thin;

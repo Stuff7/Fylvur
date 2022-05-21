@@ -30,9 +30,9 @@
   .Folder {
     display: block;
     overflow: visible;
-    width: var(--width);
+    width: calc(var(--width) * 1.025);
     aspect-ratio: 128 / 91;
-    margin-top: 1%;
+    margin-top: calc(var(--width) * 0.07);
   }
 
   /* Folder's back */
@@ -63,7 +63,7 @@
         transform: rotateX(-15deg);
       }
       & .Folder__paper {
-        transform: rotate(-4deg) translateY(-10%) translateZ(-5px);
+        transform: rotate(-4deg) translateY(-10%) translateZ(calc(var(--width) * -0.1));
       }
     }
   }
@@ -103,7 +103,7 @@
     top: 6%;
     left: 3%;
     box-shadow: 0 0 5px 5px color.get-rgba(root-shadow, 0.05);
-    transform: rotate(-1deg) translateZ(-5px);
+    transform: rotate(-1deg) translateZ(calc(var(--width) * -0.1));
     border: 1px solid #ddd;
     transition: transform 0.2s;
   }

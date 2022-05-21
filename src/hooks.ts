@@ -74,7 +74,7 @@ async function getMedia(req: Request, file: string, searchParams: URLSearchParam
     const image = await sharp(file);
     const scaledImage = await (
       w ? image.resize(w) : image
-    ).toBuffer().catch(() => (
+    ).rotate().toBuffer().catch(() => (
       createReadStream(file) as unknown as ReadableStream
     ));
 

@@ -5,6 +5,7 @@
   export let href = '';
   export let hrefStatic = '';
   export let name = '';
+  export let thumbnailSize = 100;
   export let width = '340px';
 </script>
 
@@ -14,7 +15,7 @@
   {href}
 >
   {#if fileType === 'image'}
-    <img src="{hrefStatic}?width=100" alt={name} />
+    <img src="{hrefStatic}?width={thumbnailSize}" alt={name} />
   {/if}
 </a>
 

@@ -2,9 +2,12 @@
   import File from 'components/File.svelte';
   import Folder from 'components/Folder.svelte';
   import Navbar from 'components/Navbar.svelte';
+  import Slider from 'components/Slider.svelte';
 
   export let files: FileInfo[] = [];
   export let folder = '';
+
+  let itemSize = 100;
 
   $: folderHistory = [
     { href: '/', name: 'Fylvur' },
@@ -28,15 +31,25 @@
       {/each}
     {/if}
   </p>
-  <span class="Explorer__item-count">
-    {files.length} items
-  </span>
+  <div class="Explorer__tools">
+    <Slider
+      min={100}
+      max={1000}
+      step={100}
+      stepIndicators
+      width="20em"
+      bind:value={itemSize}
+    />
+    <span class="Explorer__item-count">
+      {files.length} items
+    </span>
+  </div>
   <div class="Explorer__scroll">
     {#each files as file }
       {#if file.isFolder}
         <Folder
           href="/{file.href}"
-          width="100px"
+          width="{itemSize}px"
         >
           {file.name}
         </Folder>
@@ -46,7 +59,8 @@
           href="/media/{file.href}"
           hrefStatic="/file/{file.href}"
           name={file.name}
-          width="100px"
+          thumbnailSize={itemSize}
+          width="{itemSize}px"
         />
       {/if}
     {/each}
@@ -79,6 +93,11 @@
       @include text.ellipsis();
       text-overflow: clip;
     }
+  }
+
+  .Explorer__tools {
+    display: flex;
+    justify-content: space-between;
   }
 
   .Explorer__item-count {
