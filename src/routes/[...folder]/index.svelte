@@ -1,0 +1,97 @@
+<script lang="ts">
+  import File from 'components/File.svelte';
+  import Folder from 'components/Folder.svelte';
+  import Navbar from 'components/Navbar.svelte';
+
+  export let files: FileInfo[] = [];
+  export let folder = '';
+
+  $: folderHistory = [
+    { href: '/', name: 'Fylvur' },
+    ...folder.split('/').map((name, i, list) => ({
+        href: i + 1 < list.length ? `/${list.slice(0, i + 1).join('/')}` : '',
+        name,
+      })).filter(({ name }) => name),
+  ];
+</script>
+
+<Navbar />
+<section class="Explorer">
+  <p class="Explorer__history">
+    {#if folderHistory.length > 1}
+      {#each folderHistory as folderItem}
+        {#if folderItem.href}
+          <a href={folderItem.href}>{folderItem.name}</a>
+        {:else}
+          <span>{folderItem.name}</span>
+        {/if}/
+      {/each}
+    {/if}
+  </p>
+  <span class="Explorer__item-count">
+    {files.length} items
+  </span>
+  <div class="Explorer__scroll">
+    {#each files as file }
+      {#if file.isFolder}
+        <Folder
+          href="/{file.href}"
+          width="100px"
+        >
+          {file.name}
+        </Folder>
+      {:else}
+        <File
+          fileType={file.type}
+          href="/media/{file.href}"
+          hrefStatic="/file/{file.href}"
+          name={file.name}
+          width="100px"
+        />
+      {/if}
+    {/each}
+  </div>
+</section>
+
+<style lang="scss">
+  @use '../../style/color';
+  @use '../../style/text';
+
+  .Explorer {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: calc(100% - 50px);
+  }
+
+  .Explorer__history {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin: 0;
+    height: 44px;
+    flex-wrap: nowrap;
+    & > a:hover {
+      text-decoration: underline;
+    }
+    & > * {
+      @include text.ellipsis();
+      text-overflow: clip;
+    }
+  }
+
+  .Explorer__item-count {
+    margin-left: auto;
+  }
+
+  .Explorer__scroll {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    overflow: hidden auto;
+    flex: 1;
+    padding: 0 1rem;
+  }
+</style>

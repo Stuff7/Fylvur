@@ -1,0 +1,49 @@
+@use 'style/color';
+@use 'style/misc';
+@use 'style/fonts';
+@use 'style/text';
+
+*, ::before, ::after {
+  @include misc.scrollbar(active-color);
+  font-family: AzeretMono, Consolas, Courier;
+  font-size: 20px;
+  box-sizing: border-box;
+}
+
+body, html, #Fylvur {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  background-color: color.get(root-bg);
+  color: color.get(root-text-color);
+}
+
+#Fylvur {
+  display: flex;
+  position: fixed;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: hidden auto;
+  @include color.get-theme-vars();
+}
+
+a {
+  -webkit-tap-highlight-color: transparent;
+  color: color.get(active-color);
+  text-decoration: none;
+  @include text.ellipsis();
+  &:visited {
+    color: color.get(neon-pink);
+  }
+}
+
+img {
+  object-fit: contain;
+  height: 100%;
+}
+
+video {
+  max-width: 100%;
+  max-height: 100%;
+}

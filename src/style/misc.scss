@@ -1,0 +1,111 @@
+@use './color';
+
+@mixin triangle-top($w, $h, $color) {
+  border-width: 0 $w $h $w;
+  border-color: transparent transparent $color transparent;
+}
+
+@mixin triangle-top-right($w, $h, $color) {
+  border-width: 0 $w $h 0;
+  border-color: transparent $color transparent transparent;
+}
+
+@mixin triangle-right($w, $h, $color) {
+  border-width: $w 0 $w $h;
+  border-color: transparent transparent transparent $color;
+}
+
+@mixin triangle-bottom-right($w, $h, $color) {
+  border-width: 0 0 $w $h;
+  border-color: transparent transparent $color transparent;
+}
+
+@mixin triangle-bottom($w, $h, $color) {
+  border-width: $h $w 0 $w;
+  border-color: $color transparent transparent transparent;
+}
+
+@mixin triangle-bottom-left($w, $h, $color) {
+  border-width: $w 0 0 $h;
+  border-color: transparent transparent transparent $color;
+}
+
+@mixin triangle-left($w, $h, $color) {
+  border-width: $w $h $w 0;
+  border-color: transparent $color transparent transparent;
+}
+
+@mixin triangle-top-left($w, $h, $color) {
+  border-width: $h $w 0 0;
+  border-color: $color transparent transparent transparent;
+}
+
+@mixin triangle($dir: 'top', $w: 10px, $h: 10px, $color: color.get(platinum)) {
+  $half-w: calc($w / 2);
+
+  width: 0;
+  height: 0;
+  border-style: solid;
+
+  @if $dir == 'top' {
+    @include triangle-top($half-w, $h, $color);
+  }
+  @else if $dir == 'top-right' {
+    @include triangle-top-right($half-w, $h, $color);
+  }
+  @else if $dir == 'right' {
+    @include triangle-right($half-w, $h, $color);
+  }
+  @else if $dir == 'bottom-right' {
+    @include triangle-bottom-right($half-w, $h, $color);
+  }
+  @else if $dir == 'bottom' {
+    @include triangle-bottom($half-w, $h, $color);
+  }
+  @else if $dir == 'bottom-left' {
+    @include triangle-bottom-left($half-w, $h, $color);
+  }
+  @else if $dir == 'left' {
+    @include triangle-left($half-w, $h, $color);
+  }
+  @else if $dir == 'top-left' {
+    @include triangle-top-left($half-w, $h, $color);
+  }
+}
+
+@mixin scrollbar($color-key: active-color) {
+  $color: color.get($color-key);
+  scrollbar-width: thin;
+  scrollbar-color: $color #0003;
+  &::-webkit-scrollbar-thumb {
+    background: $color;
+    border-radius: 20px;
+  }
+  &::-webkit-scrollbar-track {
+    background: #0003;
+  }
+  &::-webkit-scrollbar {
+    width: 3px;
+  }
+}
+
+@mixin shadow {
+  box-shadow: 0px 0px 10px 0px color.get(root-shadow);
+}
+
+@mixin rounded-outline-after($radius: 1em, $border: 1px solid) {
+  position: relative;
+  &:after {
+    content: '';
+    @include rounded-outline($radius, $border)
+  }
+}
+
+@mixin rounded-outline($radius: 1em, $border: 1px solid) {
+  position: absolute;
+  border: $border;
+  border-radius: $radius;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+}
