@@ -22,3 +22,10 @@ export function* range(start: number, stop?: number, step = 1) {
     }
   }
 }
+
+export function inRange(n: number, lower: number, upper?: number) {
+  if (upper === undefined) {
+    return n >= 0 && n <= lower;
+  }
+  return n >= lower && n <= upper;
+}

@@ -18,6 +18,7 @@ $color-vars: (
   fern-green: #4F7942,
   golden-rod: #DAA520,
   grey: #808080,
+  indigo: #3F00FF,
   jade: #00A36C,
   jet-black: #343434,
   licorice: #1B1212,
@@ -37,6 +38,7 @@ $color-vars: (
   onyx: #353935,
   platinum: #E5E4E2,
   poppy: #E35335,
+  rose: #F33A6A,
   sage-green: #8A9A5B,
   sienna: #A0522D,
   smoke: #848884,
@@ -57,6 +59,7 @@ $themes: (
     root-bg: map.get($color-vars, medium-grey),
     root-shadow: map.get($color-vars, black),
     root-text-color: map.get($color-vars, platinum),
+    text-color-01: map.get($color-vars, vanilla),
   ),
   light: (
     active-color: map.get($color-vars, bronze),
@@ -67,6 +70,7 @@ $themes: (
     root-bg: map.get($color-vars, platinum),
     root-shadow: map.get($color-vars, onyx),
     root-text-color: map.get($color-vars, onyx),
+    text-color-01: map.get($color-vars, jet-black),
   ),
 );
 

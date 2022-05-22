@@ -1,0 +1,7 @@
+@mixin pulse {
+  @keyframes pulse {
+    from { opacity: 0.5; }
+    50% { opacity: 0.5; }
+  }
+  animation: pulse 2s infinite;
+}

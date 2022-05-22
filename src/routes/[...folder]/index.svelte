@@ -3,12 +3,12 @@
   import Folder from 'components/Folder.svelte';
   import Navbar from 'components/Navbar.svelte';
   import Slider from 'components/Slider.svelte';
+  import preferences from 'store/preferences';
 
   export let files: FileInfo[] = [];
   export let folder = '';
 
-  let itemSize = 100;
-
+  $: itemSize = $preferences.itemSize;
   $: folderHistory = [
     { href: '/', name: 'Fylvur' },
     ...folder.split('/').map((name, i, list) => ({
@@ -38,7 +38,7 @@
       step={100}
       stepIndicators
       width="20em"
-      bind:value={itemSize}
+      bind:value={$preferences.itemSize}
     />
     <span class="Explorer__item-count">
       {files.length} items

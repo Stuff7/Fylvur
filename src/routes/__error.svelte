@@ -1,5 +1,4 @@
 <script context="module" lang="ts">
-  import 'style/index.scss';
   import type { Load } from '@sveltejs/kit';
 
   export const load: Load = ({ error, status }) => {
@@ -13,42 +12,31 @@
 </script>
 
 <script lang="ts">
+  import Error404 from 'components/error/Error404.svelte';
+import Error500 from 'components/error/Error500.svelte';
+  import Navbar from 'components/Navbar.svelte';
+  import { inRange } from 'utils/math';
+
   export let error = {} as Error;
   export let status = 0;
 </script>
 
-<div class="ErrorPage">
-  <h1 class="ErrorPage__title">
-    <span>{error.name} {status}</span>
-    <span>{error.message}</span>
-  </h1>
-  {#if error.cause}
-    <span>{error.cause}</span>
+<Navbar />
+<div class="Error">
+  {#if inRange(status, 400, 499)}
+    <Error404 />
+  {:else}
+    <Error500 {error} />
   {/if}
-  <pre class="ErrorPage__stack">
-    {error.stack}
-  </pre>
 </div>
 
 <style lang="scss">
   @use '../style/color';
 
-  .ErrorPage {
+  .Error {
     padding: 1rem;
     width: 100%;
-    height: 100%;
-    background: color.get(medium-grey);
-  }
-
-  .ErrorPage__title {
-    &, & > * {
-      color: color.get(error-color);
-      font-size: 2rem;
-      font-weight: 700;
-    }
-  }
-
-  .ErrorPage__stack {
-    white-space: pre-wrap;
+    height: calc(100% - 50px);
+    background: color.get(root-bg);
   }
 </style>

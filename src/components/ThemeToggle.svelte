@@ -1,22 +1,11 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import type { Writable } from 'svelte/store';
   import Sun from 'components/icons/Sun.svelte';
   import Moon from 'components/icons/Moon.svelte';
   import { genCssVars } from 'utils/style';
-  import type { PreferencesStore } from 'store/preferences';
-
-  onMount(() => {
-    import('store/preferences').then(({ default: mod }) => {
-      preferences = mod;
-    });
-    rootElement = document.getElementById('Fylvur') as HTMLDivElement;
-  });
+  import preferences from 'store/preferences';
 
   export let width = '3rem';
   let checked: boolean;
-  let rootElement: HTMLDivElement | null = null;
-  let preferences: Writable<PreferencesStore>;
 
   function changeTheme(this: HTMLInputElement) {
     $preferences.theme = this.checked ? 'dark' : 'light';
@@ -24,9 +13,6 @@
 
   $: if (preferences) {
     checked = $preferences.theme === 'dark';
-  }
-  $: if (rootElement && preferences) {
-    rootElement.dataset.theme = $preferences.theme;
   }
 </script>
 

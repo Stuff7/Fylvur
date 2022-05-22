@@ -26,13 +26,10 @@ const config = {
     vite: {
       envPrefix: 'FYLVUR_',
       resolve: {
-        alias: {
-          ...srcDirs.reduce((aliases, dir) => {
-            aliases[dir] = path.resolve(__dirname, 'src', dir);
-            return aliases;
-          }, {}),
-          'fylvur': path.resolve(__dirname, 'src'),
-        },
+        alias: srcDirs.reduce((aliases, dir) => {
+          aliases[dir] = path.resolve(__dirname, 'src', dir);
+          return aliases;
+        }, {}),
       },
     },
 	},

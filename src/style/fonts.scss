@@ -38,4 +38,17 @@ $weight-name-map: (
   }
 }
 
+@mixin load-single-style-font(
+  $font-name,
+  $font-weight: 400,
+  $font-variant: "Regular",
+  $font-type: "ttf",
+) {
+  @font-face {
+    @include font-rules($font-name, $font-weight, $font-variant, $font-type);
+  }
+}
+
+@include load-single-style-font("Koulen");
+
 @include load-font("AzeretMono");

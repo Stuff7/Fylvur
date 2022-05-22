@@ -1,25 +1,22 @@
-import { writable } from 'svelte/store';
-import { getLocalItem, setLocalItem } from 'utils/local-storage';
+import { createLocalStore } from 'utils/local-storage';
 
 export const PREFERENCES_STORE_KEY = 'Preferences';
 
 export type ThemeKey = 'light' | 'dark';
 
 export interface PreferencesStore {
+  itemSize: number;
   theme: ThemeKey;
 }
 
-const initialState = getLocalItem(PREFERENCES_STORE_KEY, {
-  isObject: true,
-  fallback: {
-    theme: 'dark',
-  },
-}) as PreferencesStore;
+export const initialState: PreferencesStore = {
+  itemSize: 100,
+  theme: 'dark',
+};
 
-const preferences = writable(initialState);
-
-preferences.subscribe((store) => {
-  setLocalItem(PREFERENCES_STORE_KEY, store);
-});
+export const [
+  preferences,
+  initPreferencesStore,
+] = createLocalStore(PREFERENCES_STORE_KEY, initialState);
 
 export default preferences;
