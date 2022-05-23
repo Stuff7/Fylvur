@@ -29,3 +29,10 @@ export function inRange(n: number, lower: number, upper?: number) {
   }
   return n >= lower && n <= upper;
 }
+
+export function clamp(n: number, min = 0, max?: number) {
+  if (max === undefined) {
+    return Math.min(Math.max(n, 0), min);
+  }
+  return Math.min(Math.max(n, min), max);
+}

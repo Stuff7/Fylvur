@@ -8,6 +8,7 @@
   export let files: FileInfo[] = [];
   export let folder = '';
 
+  $: currentFolder = folder.split('/').pop();
   $: itemSize = $preferences.itemSize;
   $: folderHistory = [
     { href: '/', name: 'Fylvur' },
@@ -17,6 +18,10 @@
       })).filter(({ name }) => name),
   ];
 </script>
+
+<svelte:head>
+  <title>Fylvur{currentFolder ? ` - ${currentFolder}` : ''}</title>
+</svelte:head>
 
 <Navbar />
 <section class="Explorer">
@@ -60,6 +65,7 @@
           hrefStatic="/file/{file.href}"
           name={file.name}
           thumbnailSize={itemSize}
+          video={file.video}
           width="{itemSize}px"
         />
       {/if}
@@ -111,6 +117,6 @@
     justify-content: center;
     overflow: hidden auto;
     flex: 1;
-    padding: 0 1rem;
+    padding: 0 0.25rem;
   }
 </style>

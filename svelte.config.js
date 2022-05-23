@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import adapter from '@sveltejs/adapter-node';
 import preprocess from 'svelte-preprocess';
 import { readdirSync, statSync } from 'fs';

@@ -33,3 +33,19 @@ export function toNumber<T>(str: string, fallback?: T) {
   const parsed = parseFloat(str);
   return isNaN(parsed) && fallback !== undefined ? fallback : parsed;
 }
+
+export function formatTime(seconds: number) {
+  const hrs = ~~(seconds / 3600);
+  const mins = ~~((seconds % 3600) / 60);
+  const secs = ~~seconds % 60;
+
+  const timestamp = [];
+  if (hrs) {
+    timestamp.push(hrs.toString().padStart(2, '0'));
+  }
+  return [
+    ...timestamp,
+    mins.toString().padStart(2, '0'),
+    secs.toString().padStart(2, '0'),
+  ].join(':');
+}

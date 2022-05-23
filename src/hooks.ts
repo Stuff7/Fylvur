@@ -1,7 +1,7 @@
 import type { Handle } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit/types/private';
 import { fileTypeFromFile, type FileTypeResult } from 'file-type';
-import { MEDIA_FOLDER } from 'utils/files';
+import { MEDIA_FOLDER, screenshotVideo } from 'utils/files';
 import { createReadStream, statSync } from 'fs';
 import path from 'path';
 import sharp from 'sharp';
@@ -41,6 +41,22 @@ async function getMedia(req: Request, file: string, searchParams: URLSearchParam
   const headers = {
     'Content-Type': fileType.mime,
   };
+
+  const thumbnailWidth = searchParams.get('thumbnail-width') || '';
+  const thumbnailTime = searchParams.get('thumbnail-time') || '';
+  if (thumbnailWidth || thumbnailTime) {
+    const time = parseFloat(thumbnailTime) || 0;
+    const width = parseInt(thumbnailWidth) || 0;
+    const thumbnail = await screenshotVideo(file, time, width);
+
+    return {
+      body: thumbnail,
+      headers: {
+        'Content-Type': 'image/webp',
+      },
+      status: 200,
+    };
+  }
 
   // Video
   if (range) {

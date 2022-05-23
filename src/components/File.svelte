@@ -1,5 +1,7 @@
 <script lang="ts">
+  import { formatTime } from 'utils/string';
   import { genCssVars } from 'utils/style';
+  import Play from 'components/icons/Play.svelte';
 
   export let fileType = '';
   export let href = '';
@@ -7,15 +9,47 @@
   export let name = '';
   export let thumbnailSize = 100;
   export let width = '340px';
+  export let video = {} as Video;
+
+  let thumbnailTime = 50;
+  let thumbnailChangeInterval = -1;
+
+  function handleMouseEnter() {
+    if (thumbnailChangeInterval === -1) {
+      thumbnailChangeInterval = window.setInterval(() => (
+        thumbnailTime = (thumbnailTime + 3) % 100
+      ), 750);
+    }
+  }
+  function handleMouseLeave() {
+    window.clearInterval(thumbnailChangeInterval);
+    thumbnailTime = 50;
+    thumbnailChangeInterval = -1;
+  }
 </script>
 
 <a
   class="File"
   style={genCssVars({ width })}
   {href}
+  on:blur={handleMouseLeave}
+  on:focus={handleMouseEnter}
+  on:pointerover={handleMouseEnter}
+  on:pointerout={handleMouseLeave}
 >
   {#if fileType === 'image'}
     <img src="{hrefStatic}?width={thumbnailSize}" alt={name} />
+  {:else if fileType === 'video'}
+    <img
+      src="{hrefStatic}?thumbnail-width={thumbnailSize}&thumbnail-time={thumbnailTime}"
+      alt={name}
+    />
+    <div class="File__video-overlay">
+      <Play class="File__play" />
+      <span class="File__video-duration">
+        {formatTime(video.duration)}
+      </span>
+    </div>
   {/if}
 </a>
 
@@ -24,14 +58,16 @@
   @use '../style/misc';
 
   .File {
+    position: relative;
     display: flex;
     justify-content: center;
     overflow: visible;
     width: var(--width);
-    aspect-ratio: 128 / 91;
+    flex: 0 0 auto;
+    aspect-ratio: 16 / 9;
     margin-top: 1%;
     background: color.get(navbar-bg);
-    @include misc.rounded-outline-after(5px, 2px solid color.get(root-text-color));
+    @include misc.rounded-outline-after(5px, 2px solid color.get-rgba(root-text-color, 0.5));
     &:hover:after {
       border-color: color.get(active-color);
     }
@@ -39,5 +75,31 @@
 
   img {
     max-width: 100%;
+  }
+
+  .File__video-overlay {
+    position: absolute;
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+  }
+
+  .File__video-duration {
+    padding: 4px;
+    background: color.get-rgba(root-bg, 0.7);
+    color: color.get(root-text-color);
+    position: absolute;
+    bottom: calc(var(--width) * 0.04);
+    right: calc(var(--width) * 0.04);
+    font-size: max(calc(var(--width) * 0.04), 10px);
+  }
+
+  :global(.File__play) {
+    position: absolute;
+    top: calc(var(--width) * 0.06);
+    left: calc(var(--width) * 0.06);
+    height: 17.7%;
+    fill: color.get(root-text-color);
+    stroke: color.get(root-text-color);
   }
 </style>

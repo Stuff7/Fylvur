@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Image from 'components/Image.svelte';
   import Video from 'components/Video.svelte';
 
   export let src = '';
@@ -12,5 +11,5 @@
 {#if fileType === 'video'}
   <Video bind:src bind:type={mime} />
 {:else if fileType === 'image'}
-  <Image bind:src bind:alt={name} />
+  <img {src} alt={name} />
 {/if}

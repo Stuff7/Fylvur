@@ -13,8 +13,11 @@
     "format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. ."
   },
   "dependencies": {
+    "@types/fluent-ffmpeg": "^2.1.20",
     "@types/sharp": "^0.30.2",
+    "dotenv": "^16.0.1",
     "file-type": "^17.1.1",
+    "fluent-ffmpeg": "^2.1.2",
     "sharp": "^0.30.4"
   },
   "devDependencies": {
