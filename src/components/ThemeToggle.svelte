@@ -1,7 +1,7 @@
 <script lang="ts">
   import Sun from 'components/icons/Sun.svelte';
   import Moon from 'components/icons/Moon.svelte';
-  import { genCssVars } from 'utils/style';
+  import { genCssVars } from 'utils/dom';
   import preferences from 'store/preferences';
 
   export let width = '3rem';

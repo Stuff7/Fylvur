@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { onDestroy, onMount } from 'svelte';
   import { formatTime } from 'utils/string';
-  import { genCssVars } from 'utils/style';
+  import { genCssVars, onHover } from 'utils/dom';
   import Play from 'components/icons/Play.svelte';
 
   export let fileType = '';
@@ -13,35 +14,44 @@
 
   let thumbnailTime = 50;
   let thumbnailChangeInterval = -1;
+  let fileElem: HTMLAnchorElement;
 
-  function handleMouseEnter() {
+  onMount(() => {
+    onHover('add', fileElem, playPreview, stopPreview);
+  });
+
+  onDestroy(() => {
+    onHover('remove', fileElem, playPreview, stopPreview);
+  });
+
+  function playPreview() {
     if (thumbnailChangeInterval === -1) {
       thumbnailChangeInterval = window.setInterval(() => (
-        thumbnailTime = (thumbnailTime + 3) % 100
-      ), 750);
+        thumbnailTime = (thumbnailTime + 1) % 100
+      ), 2e3);
     }
   }
-  function handleMouseLeave() {
+
+  function stopPreview() {
     window.clearInterval(thumbnailChangeInterval);
     thumbnailTime = 50;
     thumbnailChangeInterval = -1;
   }
+
+  $: previewing = thumbnailChangeInterval !== -1;
 </script>
 
 <a
   class="File"
   style={genCssVars({ width })}
   {href}
-  on:blur={handleMouseLeave}
-  on:focus={handleMouseEnter}
-  on:pointerover={handleMouseEnter}
-  on:pointerout={handleMouseLeave}
+  bind:this={fileElem}
 >
   {#if fileType === 'image'}
     <img src="{hrefStatic}?width={thumbnailSize}" alt={name} />
   {:else if fileType === 'video'}
     <img
-      src="{hrefStatic}?thumbnail-width={thumbnailSize}&thumbnail-time={thumbnailTime}"
+      src="{hrefStatic}?tn-width={thumbnailSize}&tn-progress={thumbnailTime}{previewing ? '&tn-gif' : ''}"
       alt={name}
     />
     <div class="File__video-overlay">

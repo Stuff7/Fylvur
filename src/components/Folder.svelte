@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { genCssVars } from 'utils/style';
+  import { genCssVars } from 'utils/dom';
 
   export let href = '';
   export let width = '340px';

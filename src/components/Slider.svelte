@@ -1,6 +1,6 @@
 <script lang="ts">
   import { range } from 'utils/math';
-  import { genCssVars } from 'utils/style';
+  import { genCssVars } from 'utils/dom';
 
   export let min = 0;
   export let max = 100;

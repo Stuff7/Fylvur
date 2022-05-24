@@ -42,12 +42,13 @@ async function getMedia(req: Request, file: string, searchParams: URLSearchParam
     'Content-Type': fileType.mime,
   };
 
-  const thumbnailWidth = searchParams.get('thumbnail-width') || '';
-  const thumbnailTime = searchParams.get('thumbnail-time') || '';
-  if (thumbnailWidth || thumbnailTime) {
-    const time = parseFloat(thumbnailTime) || 0;
+  const thumbnailWidth = searchParams.get('tn-width') || '';
+  const thumbnailProgress = searchParams.get('tn-progress') || '';
+  const thumbnailGif = searchParams.has('tn-gif');
+  if (thumbnailWidth || thumbnailProgress || thumbnailGif) {
+    const progress = parseFloat(thumbnailProgress) || 0;
     const width = parseInt(thumbnailWidth) || 0;
-    const thumbnail = await screenshotVideo(file, time, width);
+    const thumbnail = await screenshotVideo(file, progress, width, thumbnailGif);
 
     return {
       body: thumbnail,

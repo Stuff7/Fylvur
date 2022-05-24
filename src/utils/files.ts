@@ -52,43 +52,46 @@ export async function getVideoMetadata(videoPath: string) {
   });
 }
 
-function webpPreset(command: FFMPEG.FfmpegCommand) {
-  return command
-    .outputOptions('-vframes 1')
-    .outputOptions('-f image2pipe')
-    .outputOptions('-vcodec webp');
+async function videoThumbnailPreset(videoPath: string, {
+  isGif = false,
+  progress = 0.5,
+  width = 100,
+}) {
+  const videoMeta = await getVideoMetadata(videoPath);
+  const thumbnailTime = (videoMeta.format.duration || 0) * progress;
+
+  return (command: FFMPEG.FfmpegCommand) => {
+    let newCommand = command
+      .seekInput(thumbnailTime) // Start video at this time
+      .outputOptions('-frames:v 1') // Take this many screenshots
+      .outputOptions('-f image2pipe') // Stream data instead of saving to disk
+      .outputOptions('-vcodec webp') // Output type
+      .videoFilters(`scale=${width}:-1`); // Resize image, calculate height from width
+    if (isGif) {
+      newCommand = newCommand
+        .outputOptions('-frames:v 11')
+        .videoFilters('fps=5'); // Fps to play the gif at
+    }
+    return newCommand;
+  };
 }
 
-function videoThumbnailPreset(videoPath: string, progress = 0.5, width = 100) {
-  return new Promise<
-    (command: FFMPEG.FfmpegCommand) => FFMPEG.FfmpegCommand
-  >((resolve, reject) => {
-    FFMPEG.ffprobe(videoPath, (err, data) => {
-      if (err) {
-        reject(err);
-      }
-
-      const thumbnailTime = (data.format.duration || 0) * progress;
-      resolve((command: FFMPEG.FfmpegCommand) => {
-        return command
-          .preset(webpPreset)
-          .seekInput(thumbnailTime)
-          .outputOptions('-ss 0') // Screenshot
-          .outputOptions(`-vf scale=${width}:-1`); // Scale image, :-1 to keep aspect ratio
-      });
-    });
-  });
-}
-
-export async function screenshotVideo(videoPath: string, progress = 50, width = 100) {
+export async function screenshotVideo(
+  videoPath: string,
+  progress = 50,
+  width = 100,
+  isGif = false,
+) {
   return new Promise<Buffer>(resolve => {
     const buff: Uint8Array[] = [];
     const pass = new PassThrough();
-    const video = FFMPEG(videoPath)
-    .output(pass, { end: true });
+    const video = FFMPEG(videoPath).output(pass, { end: true });
 
-    videoThumbnailPreset(videoPath, clamp(progress, 99) / 100, width)
-      .then(preset => video.preset(preset).run());
+    videoThumbnailPreset(videoPath, {
+      isGif,
+      progress: clamp(progress, 99) / 100,
+      width,
+    }).then(preset => video.preset(preset).run());
 
     pass.on('data', chunk => {
       buff.push(chunk);
