@@ -158,8 +158,8 @@ import Fire from 'components/icons/Fire.svelte';
   }
 
   .Error500__debug {
-    background: color.get-rgba(black, 0.7);
-    color: color.get(neon-pale-red);
+    background: color.get-rgba(console-bg, 0.7);
+    color: color.get(console-text-color);
     width: 85%;
     padding: 1rem;
     border-radius: 5px;

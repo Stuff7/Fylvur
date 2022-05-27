@@ -4,7 +4,7 @@
 
   export let min = 0;
   export let max = 100;
-  export let step = 1;
+  export let step = 0.001;
   export let width = '2em';
   export let value = 0;
   export let stepIndicators = false;

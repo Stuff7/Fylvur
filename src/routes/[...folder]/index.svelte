@@ -50,7 +50,7 @@
     </span>
   </div>
   <div class="Explorer__scroll">
-    {#each files as file }
+    {#each files as file, i }
       {#if file.isFolder}
         <Folder
           href="/{file.href}"
@@ -60,12 +60,9 @@
         </Folder>
       {:else}
         <File
-          fileType={file.type}
-          href="/media/{file.href}"
-          hrefStatic="/file/{file.href}"
+          href={file.href}
           name={file.name}
           thumbnailSize={itemSize}
-          video={file.video}
           width="{itemSize}px"
         />
       {/if}

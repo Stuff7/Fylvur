@@ -7,7 +7,7 @@ import path from 'path';
 import sharp from 'sharp';
 
 export const handle: Handle = async ({ event, resolve }) => {
-  if (event.url.pathname.startsWith('/file')) {
+  if (event.url.pathname.startsWith('/file/')) {
     const { request } = event;
     const file = event.url.pathname.replace('/file/', '');
     const filePath = decodeURIComponent(path.resolve(MEDIA_FOLDER, file));
@@ -46,9 +46,8 @@ async function getMedia(req: Request, file: string, searchParams: URLSearchParam
   const thumbnailProgress = searchParams.get('tn-progress') || '';
   const thumbnailGif = searchParams.has('tn-gif');
   if (thumbnailWidth || thumbnailProgress || thumbnailGif) {
-    const progress = parseFloat(thumbnailProgress) || 0;
     const width = parseInt(thumbnailWidth) || 0;
-    const thumbnail = await screenshotVideo(file, progress, width, thumbnailGif);
+    const thumbnail = await screenshotVideo(file, thumbnailProgress, width, thumbnailGif);
 
     return {
       body: thumbnail,

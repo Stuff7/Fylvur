@@ -4,60 +4,73 @@
   import { genCssVars, onHover } from 'utils/dom';
   import Play from 'components/icons/Play.svelte';
 
-  export let fileType = '';
   export let href = '';
-  export let hrefStatic = '';
   export let name = '';
   export let thumbnailSize = 100;
   export let width = '340px';
-  export let video = {} as Video;
 
-  let thumbnailTime = 50;
+  let details = {} as FileDetails;
+  let thumbnailTime = 0;
   let thumbnailChangeInterval = -1;
   let fileElem: HTMLAnchorElement;
 
-  onMount(() => {
-    onHover('add', fileElem, playPreview, stopPreview);
+  onMount(async () => {
+    details = (await fetch(`/file-details/${href}`)
+      .then<{ details: FileDetails }>(res => res.json())
+    ).details;
+    if (details.type === 'video') {
+      onHover('add', fileElem, playPreview, stopPreview);
+    }
   });
 
   onDestroy(() => {
-    onHover('remove', fileElem, playPreview, stopPreview);
+    if (details.type === 'video') {
+      onHover('remove', fileElem, playPreview, stopPreview);
+    }
   });
 
   function playPreview() {
     if (thumbnailChangeInterval === -1) {
       thumbnailChangeInterval = window.setInterval(() => (
-        thumbnailTime = (thumbnailTime + 1) % 100
+        thumbnailTime = (thumbnailTime + 2) % videoDuration
       ), 2e3);
     }
   }
 
   function stopPreview() {
     window.clearInterval(thumbnailChangeInterval);
-    thumbnailTime = 50;
+    thumbnailTime = videoDuration / 2;
     thumbnailChangeInterval = -1;
   }
 
+  $: videoDuration = (details.video?.duration || 0);
   $: previewing = thumbnailChangeInterval !== -1;
+  $: thumbnailTime = videoDuration / 2;
 </script>
 
 <a
   class="File"
   style={genCssVars({ width })}
-  {href}
+  href="/media/{href}"
   bind:this={fileElem}
 >
-  {#if fileType === 'image'}
-    <img src="{hrefStatic}?width={thumbnailSize}" alt={name} />
-  {:else if fileType === 'video'}
+  {#if details.type === 'image'}
+    <img src="/file/{href}?width={thumbnailSize}" alt={name} />
+  {:else if details.type === 'video'}
     <img
-      src="{hrefStatic}?tn-width={thumbnailSize}&tn-progress={thumbnailTime}{previewing ? '&tn-gif' : ''}"
+      src="/file/{href}?tn-width={thumbnailSize}&tn-progress={thumbnailTime || encodeURI('50%')}{previewing ? '&tn-gif' : ''}"
       alt={name}
     />
     <div class="File__video-overlay">
-      <Play class="File__play" />
+      <Play />
       <span class="File__video-duration">
-        {formatTime(video.duration)}
+        {formatTime(videoDuration)}
+      </span>
+    </div>
+  {:else}
+    <div class="File__placeholder">
+      <span class="File__placeholder-text">
+        {name}
       </span>
     </div>
   {/if}
@@ -66,6 +79,7 @@
 <style lang="scss">
   @use '../style/color';
   @use '../style/misc';
+  @use '../style/text';
 
   .File {
     position: relative;
@@ -83,6 +97,20 @@
     }
   }
 
+  .File__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .File__placeholder-text {
+    @include text.ellipsis(3);
+    text-align: center;
+  }
+
   img {
     max-width: 100%;
   }
@@ -92,6 +120,14 @@
     pointer-events: none;
     width: 100%;
     height: 100%;
+    & :global(.Play) {
+      position: absolute;
+      top: calc(var(--width) * 0.06);
+      left: calc(var(--width) * 0.06);
+      height: 17.7%;
+      fill: color.get(root-text-color);
+      stroke: color.get(root-text-color);
+    }
   }
 
   .File__video-duration {
@@ -102,14 +138,5 @@
     bottom: calc(var(--width) * 0.04);
     right: calc(var(--width) * 0.04);
     font-size: max(calc(var(--width) * 0.04), 10px);
-  }
-
-  :global(.File__play) {
-    position: absolute;
-    top: calc(var(--width) * 0.06);
-    left: calc(var(--width) * 0.06);
-    height: 17.7%;
-    fill: color.get(root-text-color);
-    stroke: color.get(root-text-color);
   }
 </style>

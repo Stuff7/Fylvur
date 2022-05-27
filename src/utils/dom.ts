@@ -15,7 +15,7 @@ export function onHover<T extends HTMLElement>(
   }
   const eventAction = `${action}EventListener` as const;
 
-  HoverEventList.forEach((eventName) => {
+  ['mouseenter', 'touchstart'].forEach((eventName) => {
     elem[eventAction](eventName, hoverListener);
   });
 
@@ -39,7 +39,56 @@ export function onHover<T extends HTMLElement>(
   }
 }
 
-const HoverEventList = [
-  'mouseenter',
-  'touchstart',
-] as const;
+export function toggleFullscreen<T extends Element>(element: T) {
+  const key = getFullscreenKeys();
+  if (!document[key.fullscreenElement]) {
+    element[key.requestFullscreen]();
+    return true;
+  } else if (document[key.exitFullscreen]) {
+    document[key.exitFullscreen]();
+  }
+  return false;
+}
+
+export function getFullscreenKeys() {
+  if (fullscreenKeys) {
+    return fullscreenKeys;
+  }
+  return fullscreenKeys = createFullscreenKeys();
+}
+
+let fullscreenKeys: ReturnType<typeof createFullscreenKeys>;
+
+function createFullscreenKeys() {
+  const doc = document as Partial<Document>;
+  if (doc.exitFullscreen) {
+    return {
+      exitFullscreen: 'exitFullscreen',
+      fullscreenElement: 'fullscreenElement',
+      fullscreenEnabled: 'fullscreenEnabled',
+      requestFullscreen: 'requestFullscreen',
+    } as const;
+  } else if (doc.webkitExitFullscreen) {
+    return {
+      exitFullscreen: 'webkitExitFullscreen',
+      fullscreenElement: 'webkitFullscreenElement',
+      fullscreenEnabled: 'webkitFullscreenEnabled',
+      requestFullscreen: 'webkitRequestFullscreen',
+    } as const;
+  } else if (doc.mozCancelFullscreen) {
+    return {
+      exitFullscreen: 'mozCancelFullscreen',
+      fullscreenElement: 'mozFullscreenElement',
+      fullscreenEnabled: 'mozFullscreenEnabled',
+      requestFullscreen: 'mozRequestFullscreen',
+    } as const;
+  } else if (doc.msExitFullscreen) {
+    return {
+      exitFullscreen: 'msExitFullscreen',
+      fullscreenElement: 'msFullscreenElement',
+      fullscreenEnabled: 'msFullscreenEnabled',
+      requestFullscreen: 'msRequestFullscreen',
+    } as const;
+  }
+  throw 'Fullscreen not supported';
+}

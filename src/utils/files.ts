@@ -1,4 +1,4 @@
-import { readdir } from 'fs/promises';
+import { readdir, stat } from 'fs/promises';
 import { fileTypeFromFile } from 'file-type';
 import { relative, resolve } from 'path';
 import { PassThrough } from 'stream';
@@ -12,24 +12,32 @@ export async function getFiles(dir: string) {
   return await Promise.all(files.map(async (file) => {
     const absFile = resolve(dir, file.name);
 
-    const fileInfo: FileInfo = {
+    return {
       href: relative(MEDIA_FOLDER, absFile).replace(/\\/g, '/'),
       isFolder: file.isDirectory(),
       name: file.name,
-    };
-
-    if (!file.isDirectory()) {
-      const fileType = await fileTypeFromFile(absFile);
-      fileInfo.mime = fileType?.mime;
-      fileInfo.type = fileType?.mime.split('/')[0];
-      if (fileInfo.type === 'video') {
-        const { duration = 0 } = (await getVideoMetadata(absFile)).format;
-        fileInfo.video = { duration };
-      }
-    }
-
-    return fileInfo;
+    } as FileInfo;
   }));
+}
+
+export async function getFileDetails(dir: string) {
+  const absFile = resolve(dir);
+  const file = await stat(absFile);
+  const info = {} as FileDetails;
+
+  if (file.isDirectory()) {
+    return info;
+  }
+
+  const fileType = await fileTypeFromFile(absFile);
+  info.mime = fileType?.mime;
+  info.type = fileType?.mime.split('/')[0];
+  if (info.type === 'video') {
+    const { duration = 0 } = (await getVideoMetadata(absFile)).format;
+    info.video = { duration };
+  }
+
+  return info;
 }
 
 export async function* getNestedFiles(dir: string): AsyncGenerator<string, void> {
@@ -54,11 +62,14 @@ export async function getVideoMetadata(videoPath: string) {
 
 async function videoThumbnailPreset(videoPath: string, {
   isGif = false,
-  progress = 0.5,
+  progress = '50%',
   width = 100,
 }) {
   const videoMeta = await getVideoMetadata(videoPath);
-  const thumbnailTime = (videoMeta.format.duration || 0) * progress;
+  const duration = (videoMeta.format.duration || 0);
+  const thumbnailTime = progress.endsWith('%') ?
+    duration * clamp(parseFloat(progress), 99) / 100 :
+    clamp(parseFloat(progress), duration);
 
   return (command: FFMPEG.FfmpegCommand) => {
     let newCommand = command
@@ -78,7 +89,7 @@ async function videoThumbnailPreset(videoPath: string, {
 
 export async function screenshotVideo(
   videoPath: string,
-  progress = 50,
+  progress = '50%',
   width = 100,
   isGif = false,
 ) {
@@ -89,7 +100,7 @@ export async function screenshotVideo(
 
     videoThumbnailPreset(videoPath, {
       isGif,
-      progress: clamp(progress, 99) / 100,
+      progress,
       width,
     }).then(preset => video.preset(preset).run());
 

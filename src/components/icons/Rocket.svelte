@@ -5,26 +5,26 @@
   const range16 = [...range(1, 16)];
 </script>
 
-<div class="scene">
-  <div class="wing-left"></div>
-  <div class="wing-right"></div>
-  <div class="exhaust"></div>
-  <div class="capsule">
-    <div class="top">
-      <div class="shadow"></div>
+<div class="Rocket">
+  <div class="Rocket__wing-left"></div>
+  <div class="Rocket__wing-right"></div>
+  <div class="Rocket__exhaust"></div>
+  <div class="Rocket__capsule">
+    <div class="Rocket__top">
+      <div class="Rocket__shadow"></div>
     </div>
-    <div class="base"></div>
+    <div class="Rocket__base"></div>
   </div>
-  <div class="window-big"></div>
-  <div class="window-small"></div>
+  <div class="Rocket__window-big"></div>
+  <div class="Rocket__window-small"></div>
   {#each range4 as i}
-  <div class="fire-{i}" />
+  <div class="Rocket__fire-{i}" />
   {/each}
   {#each range4 as i}
-  <div class="spark-{i}" />
+  <div class="Rocket__spark-{i}" />
   {/each}
   {#each range16 as i}
-  <div class="star star--{i}" />
+  <div class="Rocket__star Rocket__star--{i}" />
   {/each}
 </div>
 
@@ -37,14 +37,14 @@
   $color-red: #E82134;
   $color-bg: color.get(root-bg);
 
-  .scene {
+  .Rocket {
     width: 202px;
     height: 300px;
     animation: vibration 0.2s infinite;
     position: relative;
   }
   
-  .wing-left { 
+  .Rocket__wing-left { 
     position: absolute;
     z-index: 10;
     height: 103px;
@@ -69,7 +69,7 @@
     }
   }
   
-  .wing-right { 
+  .Rocket__wing-right { 
     position: absolute;
     z-index: 10;
     height: 103px;
@@ -95,7 +95,7 @@
     }
   }
   
-  .exhaust {
+  .Rocket__exhaust {
     position: absolute;
     z-index: 20;
     top: 156px;
@@ -107,7 +107,7 @@
     border-right: 8px solid transparent;
   }
   
-  .capsule {
+  .Rocket__capsule {
     position: absolute;
     z-index: 30;
     background: $color-bg;
@@ -117,7 +117,7 @@
     height: 156px;
     opacity: 1;
     overflow:hidden;
-    & .base {
+    & .Rocket__base {
       position: absolute;
       background: #ccc;
       width: 112px;
@@ -126,7 +126,7 @@
       left: 0px;
       background: linear-gradient(to right, color.get(root-text-color) 0%, color.get(root-text-color) 65%, color.get(text-color-01) 65%, color.get(text-color-01) 100%);
     }
-    & .top {
+    & .Rocket__top {
       position: absolute;
       height: 0px;
       width: 0px;
@@ -148,7 +148,7 @@
         left: 25px;
         z-index: 50;
       }
-      .shadow {
+      .Rocket__shadow {
         position: absolute;
         height: 0px;
         width: 0px;
@@ -163,7 +163,7 @@
     }
   }
   
-  .window-big {
+  .Rocket__window-big {
     width: 70px;
     height: 70px;
     background: $color-purple;
@@ -174,7 +174,7 @@
     left: 66px;
   }
   
-  .window-small {
+  .Rocket__window-small {
     width: 44px;
     height: 44px;
     background: $color-darkpurple;
@@ -193,7 +193,7 @@
     animation:main_fire 0.1s cubic-bezier(0.175, 0.885, 0.420, 1.410) infinite;
   }
   
-  .fire-1 {
+  .Rocket__fire-1 {
     position: absolute;
     height: 70px;
     width: 70px;
@@ -207,7 +207,7 @@
     @extend .main_fire;
   }
   
-  .fire-2 {
+  .Rocket__fire-2 {
     display: none;
     position: absolute;
     height: 55px;
@@ -223,7 +223,7 @@
     animation-delay:0.2s;
   }
   
-  .fire-3 {
+  .Rocket__fire-3 {
     position: absolute;
     height: 22px;
     width: 22px;
@@ -238,7 +238,7 @@
     animation-delay:0.2s;
   }
   
-  .fire-4 {
+  .Rocket__fire-4 {
     position: absolute;
     height: 22px;
     width: 22px;
@@ -257,7 +257,7 @@
     animation: dancing_fire 0.24s infinite; 
   }
   
-  .spark-1 {
+  .Rocket__spark-1 {
     position: absolute;
     bottom: 177px;
     z-index: 20;
@@ -270,7 +270,7 @@
     @extend .propulsed;
   }
   
-  .spark-2 {
+  .Rocket__spark-2 {
     position: absolute;
     bottom: 147px;
     z-index: 20;
@@ -284,7 +284,7 @@
     animation-delay:0.22s;
   }
   
-  .spark-3 {
+  .Rocket__spark-3 {
     position: absolute;
     bottom: 90px;
     z-index: 20;
@@ -298,7 +298,7 @@
     animation-delay:0.32s;
   }
   
-  .spark-4 {
+  .Rocket__spark-4 {
     position: absolute;
     bottom: 20px;
     left: 83px;
@@ -316,90 +316,90 @@
     animation: hyperspace 0.4s infinite; 
   }
   
-  .star {
+  .Rocket__star {
     position: absolute;
     width: 4px;
     height: 20px;
     background:#fff;
     z-index: 90;
     @extend .hyperspace;
-    &.star--1 {
+    &.Rocket__star--1 {
       left: 50px;
       top: -10px;
       animation-delay:0.10s;
     }
-    &.star--2 {
+    &.Rocket__star--2 {
       right: 60px;
       top: 30px;
       animation-delay:0.10s;
     }
-    &.star--3 {
+    &.Rocket__star--3 {
       top: 80px;
       left: 25px;
       animation-delay:0.2s;
     }
-    &.star--4 {
+    &.Rocket__star--4 {
       top: -20px;
       right: 75px;
       animation-delay:0.2s;
     }
-    &.star--5 {
+    &.Rocket__star--5 {
       right: 30px;
       top: -60px;
       animation-delay:0.30s;
     }
-    &.star--6 {
+    &.Rocket__star--6 {
       right: 160px;
       top: 50px;
       animation-delay:0.40s;
     }
-    &.star--7 {
+    &.Rocket__star--7 {
       top: 20px;
       left: 75px;
       animation-delay:0.3s;
     }
-    &.star--8 {
+    &.Rocket__star--8 {
       top: -30px;
       right: 95px;
       animation-delay:0.4s;
     }
-    &.star--9 {
+    &.Rocket__star--9 {
       right: 30px;
       top: -60px;
       animation-delay:0.30s;
     }
-    &.star--10 {
+    &.Rocket__star--10 {
       right: 160px;
       top: 50px;
       animation-delay:0.40s;
     }
-    &.star--11 {
+    &.Rocket__star--11 {
       top: 20px;
       left: 75px;
       animation-delay:0.3s;
     }
-    &.star--12 {
+    &.Rocket__star--12 {
       top: -30px;
       right: 95px;
       animation-delay:0.4s;
     }
     
-    &.star--13 {
+    &.Rocket__star--13 {
       left: -30px;
       top: -60px;
       animation-delay:0.30s;
     }
-    &.star--14 {
+    &.Rocket__star--14 {
       right: -20px;
       top: 50px;
       animation-delay:0.40s;
     }
-    &.star--15 {
+    &.Rocket__star--15 {
       top: 20px;
       left: -75px;
       animation-delay:0.3s;
     }
-    &.star--16 {
+    &.Rocket__star--16 {
       top: -30px;
       right: -95px;
       animation-delay:0.4s;
