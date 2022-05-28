@@ -53,8 +53,8 @@ S86.2,38.6,93.9,46.4z';
 
     @each $c in $colors {
       $i: index($colors, $c);
-      $s: ( $anim-speed / $i * length($colors));
-      $d: (-$anim-speed / $i * length($colors) * 0.66);
+      $s: calc($anim-speed / $i * length($colors));
+      $d: calc($anim-speed / $i * -1 * length($colors) * 0.66);
 
       &--#{$i} {
         &.animated {
@@ -77,7 +77,7 @@ S86.2,38.6,93.9,46.4z';
       transform: translate(-2px, 2px);
     }
     50% {
-      stroke-dasharray: $dash-array / 6, $dash-array;
+      stroke-dasharray: calc($dash-array / 6), $dash-array;
       stroke-dashoffset: -$dash-array * 0.3;
     }
     65% { 
