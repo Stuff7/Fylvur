@@ -39,25 +39,43 @@ export function onHover<T extends HTMLElement>(
   }
 }
 
-export function toggleFullscreen<T extends Element>(element: T) {
-  const key = getFullscreenKeys();
-  if (!document[key.fullscreenElement]) {
-    element[key.requestFullscreen]();
+export function toggleFullscreen<T extends Element>(element: T, videoElement: HTMLVideoElement) {
+  const { fullscreenKeys: key, isSafari } = getBrowserInfo();
+
+  if (isSafari && videoElement.webkitSupportsFullscreen) {
+    if (videoElement.webkitDisplayingFullscreen) {
+      videoElement.webkitExitFullscreen();
+      return false;
+    }
+    videoElement.webkitEnterFullscreen();
     return true;
-  } else if (document[key.exitFullscreen]) {
+  }
+
+  if (document[key.fullscreenElement]) {
     document[key.exitFullscreen]();
+    return false;
   }
-  return false;
+  element[key.requestFullscreen]();
+  return true;
 }
 
-export function getFullscreenKeys() {
-  if (fullscreenKeys) {
-    return fullscreenKeys;
+export function getBrowserInfo() {
+  if (browserInfo) {
+    return browserInfo;
   }
-  return fullscreenKeys = createFullscreenKeys();
+  const isSafari = checkIfSafari();
+  return browserInfo = {
+    fullscreenKeys: isSafari ?
+      {} as ReturnType<typeof createFullscreenKeys> :
+      createFullscreenKeys(),
+    isSafari,
+  };
 }
 
-let fullscreenKeys: ReturnType<typeof createFullscreenKeys>;
+let browserInfo: {
+  fullscreenKeys: ReturnType<typeof createFullscreenKeys>;
+  isSafari: boolean;
+};
 
 function createFullscreenKeys() {
   const doc = document as Partial<Document>;
@@ -91,4 +109,11 @@ function createFullscreenKeys() {
     } as const;
   }
   throw 'Fullscreen not supported';
+}
+
+export function checkIfSafari() {
+  return !!(
+    navigator.userAgent.match(/(iPod|iPhone|iPad)/) &&
+    navigator.userAgent.match(/AppleWebKit/)
+  );
 }

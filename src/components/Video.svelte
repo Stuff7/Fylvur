@@ -1,96 +1,96 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { dev } from '$app/env';
+  import { onDestroy, onMount } from 'svelte';
   import Fullscreen from './icons/Fullscreen.svelte';
   import Play from './icons/Play.svelte';
+  import Infinity from './icons/Infinity.svelte';
   import Slider from './Slider.svelte';
-  import { getFullscreenKeys, toggleFullscreen } from 'utils/dom';
+  import { checkIfSafari, toggleFullscreen } from 'utils/dom';
 
   export let src = '';
   export let type = '';
 
+  onMount(() => {
+    isSafari = checkIfSafari();
+    if (isSafari) {
+      video.addEventListener('webkitendfullscreen', handleEndFullscreen);
+    }
+  });
+
+  onDestroy(() => {
+    if (isSafari) {
+      video.removeEventListener('webkitendfullscreen', handleEndFullscreen);
+    }
+  });
+
+  let isSafari = false;
   let video: HTMLVideoElement;
   let currentTime = 0;
   let duration = 0;
   let isFullscreen = false;
   let paused = false;
   let videoContainer: HTMLDivElement;
+  let loop = true;
 
-  let fullscreenSupported: boolean;
-
-  onMount(() => {
-    try {
-      getFullscreenKeys();
-      fullscreenSupported = true;
-    } catch(e) {
-      fullscreenSupported = false;
-    }
-  });
+  function handleEndFullscreen() {
+    isFullscreen = false;
+  }
 
   function togglePlay() {
     video[video.paused ? 'play' : 'pause']();
   }
 
   function fullscreen() {
-    if (fullscreenSupported) {
-      isFullscreen = toggleFullscreen(videoContainer);
-    }
+    isFullscreen = toggleFullscreen(videoContainer, video);
+  }
+
+  function toggleLoop() {
+    loop = !loop;
   }
 </script>
 
 <svelte:head><meta name="viewport" content="minimal-ui"></svelte:head>
 
-{#if dev}
-  <div class="Video" bind:this={videoContainer}>
-    <div class="Video__controls">
-      {#if fullscreenSupported}
-        <div class="Video__controls-top">
-          <button class="Video__button" on:click={fullscreen}>
-            <Fullscreen enabled={isFullscreen} />
-          </button>
-        </div>
-      {/if}
-      <div
-        class="Video__controls-center"
-        on:click={togglePlay}
-        on:dblclick={fullscreen}
-      />
-      <div class="Video__controls-bottom">
-        <Slider
-          max={duration}
-          width="100%"
-          bind:value={currentTime}
-        />
-        <button class="Video__button" on:click={togglePlay}>
-          <Play {paused} />
-        </button>
-      </div>
+<div class="Video" bind:this={videoContainer}>
+  <div class="Video__controls">
+    <div class="Video__controls-top">
+      <button class="Video__button" on:click={fullscreen}>
+        <Fullscreen enabled={isFullscreen} />
+      </button>
     </div>
-    <!-- svelte-ignore a11y-media-has-caption -->
-    <video
-      class="Video__source"
-      autoplay
-      {src}
-      {type}
-      bind:this={video}
-      bind:currentTime
-      bind:duration
-      bind:paused
-    >
-      Sorry, your browser doesn't support this video.
-    </video>
+    <div
+      class="Video__controls-center"
+      on:click={togglePlay}
+      on:dblclick={fullscreen}
+    />
+    <Slider
+      max={duration}
+      width="100%"
+      bind:value={currentTime}
+    />
+    <div class="Video__controls-bottom">
+      <button class="Video__button" on:click={togglePlay}>
+        <Play {paused} />
+      </button>
+      <button class="Video__button" on:click={toggleLoop}>
+        <Infinity animated={loop} />
+      </button>
+    </div>
   </div>
-{:else}
   <!-- svelte-ignore a11y-media-has-caption -->
   <video
+    class="Video__source"
     autoplay
-    controls
+    {loop}
     {src}
     {type}
+    bind:this={video}
+    bind:currentTime
+    bind:duration
+    bind:paused
   >
     Sorry, your browser doesn't support this video.
   </video>
-{/if}
+</div>
 
 <style lang="scss">
   @use '../style/color';
@@ -98,7 +98,7 @@
   .Video {
     position: relative;
     width: 100%;
-    max-height: 100%;
+    max-height: calc(100% - 50px);
     margin: auto 0;
     display: flex;
     align-items: center;
@@ -130,6 +130,10 @@
     flex: 1;
   }
 
+  .Video__controls-bottom {
+    display: flex;
+  }
+
   .Video__button {
     display: flex;
     justify-content: center;
@@ -142,7 +146,7 @@
     cursor: pointer;
     & :global(*) {
       fill: color.get(root-text-color);
-      filter: drop-shadow(3px 5px 2px color.get(root-shadow));
+      filter: drop-shadow(1px 2px 3px color.get(root-shadow));
       width: 100%;
       height: 100%;
     }

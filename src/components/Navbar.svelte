@@ -21,6 +21,9 @@
     padding: 0 1rem;
     align-items: center;
     background: color.get(navbar-bg);
+    position: sticky;
+    top: 0;
+    z-index: 1;
     @include misc.shadow();
   }
 

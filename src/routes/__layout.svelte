@@ -3,14 +3,15 @@
   import { onMount } from 'svelte';
   import 'style/index.scss';
   import preferences, { initPreferencesStore } from 'store/preferences';
-import Console from 'components/debug/Console.svelte';
+  import Console from 'components/debug/Console.svelte';
+  import Navbar from 'components/Navbar.svelte';
 
   onMount(() => {
     initPreferencesStore();
-    rootElement = document.getElementById('Fylvur') as HTMLDivElement;
+    rootElement = document.querySelector('html');
   });
 
-  let rootElement: HTMLDivElement | null = null;
+  let rootElement: HTMLHtmlElement | null = null;
 
   $: if (rootElement && preferences) {
     rootElement.dataset.theme = $preferences.theme;
@@ -20,4 +21,5 @@ import Console from 'components/debug/Console.svelte';
 {#if dev}
   <Console />
 {/if}
+<Navbar />
 <slot />

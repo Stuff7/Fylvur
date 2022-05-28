@@ -13,15 +13,13 @@
 
 <script lang="ts">
   import Error404 from 'components/error/Error404.svelte';
-import Error500 from 'components/error/Error500.svelte';
-  import Navbar from 'components/Navbar.svelte';
+  import Error500 from 'components/error/Error500.svelte';
   import { inRange } from 'utils/math';
 
   export let error = {} as Error;
   export let status = 0;
 </script>
 
-<Navbar />
 <div class="Error">
   {#if inRange(status, 400, 499)}
     <Error404 />

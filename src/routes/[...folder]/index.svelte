@@ -1,7 +1,6 @@
 <script lang="ts">
   import File from 'components/File.svelte';
   import Folder from 'components/Folder.svelte';
-  import Navbar from 'components/Navbar.svelte';
   import Slider from 'components/Slider.svelte';
   import preferences from 'store/preferences';
 
@@ -23,33 +22,34 @@
   <title>Fylvur{currentFolder ? ` - ${currentFolder}` : ''}</title>
 </svelte:head>
 
-<Navbar />
 <section class="Explorer">
-  <p class="Explorer__history">
-    {#if folderHistory.length > 1}
-      {#each folderHistory as folderItem}
-        {#if folderItem.href}
-          <a href={folderItem.href}>{folderItem.name}</a>
-        {:else}
-          <span>{folderItem.name}</span>
-        {/if}/
-      {/each}
-    {/if}
-  </p>
-  <div class="Explorer__tools">
-    <Slider
-      min={100}
-      max={1000}
-      step={100}
-      stepIndicators
-      width="20em"
-      bind:value={$preferences.itemSize}
-    />
-    <span class="Explorer__item-count">
-      {files.length} items
-    </span>
+  <div class="Explorer__nav">
+    <p class="Explorer__history">
+      {#if folderHistory.length > 1}
+        {#each folderHistory as folderItem}
+          {#if folderItem.href}
+            <a href={folderItem.href}>{folderItem.name}</a>
+          {:else}
+            <span>{folderItem.name}</span>
+          {/if}/
+        {/each}
+      {/if}
+    </p>
+    <div class="Explorer__tools">
+      <Slider
+        min={100}
+        max={1000}
+        step={100}
+        stepIndicators
+        width="20em"
+        bind:value={$preferences.itemSize}
+      />
+      <span class="Explorer__item-count">
+        {files.length} items
+      </span>
+    </div>
   </div>
-  <div class="Explorer__scroll">
+  <div class="Explorer__list">
     {#each files as file, i }
       {#if file.isFolder}
         <Folder
@@ -73,13 +73,27 @@
 <style lang="scss">
   @use '../../style/color';
   @use '../../style/text';
+  @use '../../style/misc';
 
   .Explorer {
-    padding: 1rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
     max-height: calc(100% - 50px);
+    & > * {
+      padding: 1rem;
+    }
+  }
+
+  .Explorer__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    position: sticky;
+    top: 50px;
+    background: color.get(root-bg);
+    z-index: 1;
+    @include misc.shadow();
   }
 
   .Explorer__history {
@@ -107,13 +121,11 @@
     margin-left: auto;
   }
 
-  .Explorer__scroll {
+  .Explorer__list {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
     justify-content: center;
-    overflow: hidden auto;
     flex: 1;
-    padding: 0 0.25rem;
   }
 </style>
