@@ -124,6 +124,11 @@
       transparent 58px
     );
     padding: 0.5rem 0.75rem;
+    transition: opacity 0.25s;
+    opacity: 0;
+    &:hover {
+      opacity: 1;
+    }
   }
 
   .Video__controls-center {
