@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { onDestroy, onMount } from 'svelte';
+  import { onMount } from 'svelte';
   import { formatTime } from 'utils/string';
-  import { genCssVars, onHover } from 'utils/dom';
+  import { genCssVars } from 'utils/dom';
+  import hover from 'actions/hover';
   import Play from 'components/icons/Play.svelte';
 
   export let href = '';
@@ -12,21 +13,11 @@
   let details = {} as FileDetails;
   let thumbnailTime = 0;
   let thumbnailChangeInterval = -1;
-  let fileElem: HTMLAnchorElement;
 
   onMount(async () => {
     details = (await fetch(`/file-details/${href}`)
       .then<{ details: FileDetails }>(res => res.json())
     ).details;
-    if (details.type === 'video') {
-      onHover('add', fileElem, playPreview, stopPreview);
-    }
-  });
-
-  onDestroy(() => {
-    if (details.type === 'video') {
-      onHover('remove', fileElem, playPreview, stopPreview);
-    }
   });
 
   function playPreview() {
@@ -52,7 +43,9 @@
   class="File"
   style={genCssVars({ width })}
   href="/media/{href}"
-  bind:this={fileElem}
+  use:hover
+  on:hover={playPreview}
+  on:hoverend={stopPreview}
 >
   {#if details.type === 'image'}
     <img src="/file/{href}?width={thumbnailSize}" alt={name} />

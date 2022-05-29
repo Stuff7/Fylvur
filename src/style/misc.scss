@@ -75,7 +75,7 @@
 
 @mixin circle($radius: 1em) {
   flex: 0 0;
-  width: $radius * 2;
+  width: calc($radius * 2);
   border-radius: 50%;
   aspect-ratio: 1 / 1;
 }
@@ -115,4 +115,38 @@
   width: 100%;
   height: 100%;
   user-select: none;
+}
+
+@mixin apply-rules($styles: ()) {
+  @each $rule, $value in $styles {
+    #{$rule}: $value;
+  }
+}
+
+@mixin input-range-track($styles: ()) {
+  input[type=range]::-webkit-slider-runnable-track {
+    @include apply-rules($styles);
+  }
+
+  input[type=range]::-moz-range-track {
+    @include apply-rules($styles);
+  }
+
+  input[type=range]::-ms-track {
+    @include apply-rules($styles);
+  }
+}
+
+@mixin input-range-thumb($styles: ()) {
+  input[type=range]::-webkit-slider-thumb {
+    @include apply-rules($styles);
+  }
+
+  input[type=range]::-moz-range-thumb {
+    @include apply-rules($styles);
+  }
+
+  input[type=range]::-ms-thumb {
+    @include apply-rules($styles);
+  }
 }

@@ -45,6 +45,15 @@ declare interface HTMLVideoElement {
   webkitWirelessVideoPlaybackDisabled: boolean;
 }
 
+declare namespace svelte.JSX {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface DOMAttributes<T> {
+    onglobalkeydown?: (e: CustomEvent<string>) => void;
+    onhover?: CompositionEventHandler<T>;
+    onhoverend?: CompositionEventHandler<T>;
+  }
+}
+
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
 declare namespace App {

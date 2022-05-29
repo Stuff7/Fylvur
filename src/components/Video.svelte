@@ -1,9 +1,11 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
+  import globalKeyDown from 'actions/globalkeydown';
   import Fullscreen from './icons/Fullscreen.svelte';
   import Play from './icons/Play.svelte';
   import Infinity from './icons/Infinity.svelte';
   import Slider from './Slider.svelte';
+  import { formatTime } from 'utils/string';
   import { checkIfSafari, toggleFullscreen } from 'utils/dom';
 
   export let src = '';
@@ -17,6 +19,7 @@
   });
 
   onDestroy(() => {
+    window.clearTimeout(hideControlsTO);
     if (isSafari) {
       video.removeEventListener('webkitendfullscreen', handleEndFullscreen);
     }
@@ -30,6 +33,14 @@
   let paused = false;
   let videoContainer: HTMLDivElement;
   let loop = true;
+  let controlsVisible = false;
+  let hideControlsTO = -1;
+
+  function showControls(hideDelay = 3e3) {
+    controlsVisible = true;
+    window.clearTimeout(hideControlsTO);
+    hideControlsTO = window.setTimeout(() => controlsVisible = false, hideDelay);
+  }
 
   function handleEndFullscreen() {
     isFullscreen = false;
@@ -46,12 +57,34 @@
   function toggleLoop() {
     loop = !loop;
   }
+
+  function keyboardControl({ detail: key }: CustomEvent<string>) {
+    showControls();
+    switch (key) {
+      case 'ArrowLeft':
+        // Using the binded currentTime variable doesn't work on Firefox
+        video.currentTime = Math.max(currentTime - 10, 0); break;
+      case 'ArrowRight':
+        video.currentTime = Math.min(currentTime + 10, duration); break;
+      case 'Space':
+        togglePlay(); break;
+      case 'KeyF':
+        fullscreen(); break;
+      case 'KeyL':
+        loop = !loop; break;
+    }
+  }
 </script>
 
 <svelte:head><meta name="viewport" content="minimal-ui"></svelte:head>
 
-<div class="Video" bind:this={videoContainer}>
-  <div class="Video__controls">
+<div
+  class="Video"
+  bind:this={videoContainer}
+  use:globalKeyDown
+  on:globalkeydown={keyboardControl}
+>
+  <div class="Video__controls" class:hover={controlsVisible}>
     <div class="Video__controls-top">
       <button class="Video__button" on:click={fullscreen}>
         <Fullscreen enabled={isFullscreen} />
@@ -62,15 +95,21 @@
       on:click={togglePlay}
       on:dblclick={fullscreen}
     />
-    <Slider
-      max={duration}
-      width="100%"
-      bind:value={currentTime}
-    />
+    {#if video}
+      <Slider
+        max={duration}
+        thumbRadius="0.35em"
+        width="100%"
+        bind:value={video.currentTime}
+      />
+    {/if}
     <div class="Video__controls-bottom">
       <button class="Video__button" on:click={togglePlay}>
         <Play {paused} />
       </button>
+      <span class="Video__time" on:click={togglePlay}>
+        {formatTime(currentTime)}/{formatTime(duration)}
+      </span>
       <button class="Video__button" on:click={toggleLoop}>
         <Infinity animated={loop} />
       </button>
@@ -126,7 +165,7 @@
     padding: 0.5rem 0.75rem;
     transition: opacity 0.25s;
     opacity: 0;
-    &:hover {
+    &:hover, &.hover {
       opacity: 1;
     }
   }
@@ -155,5 +194,13 @@
       width: 100%;
       height: 100%;
     }
+  }
+
+  .Video__time {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    font-size: 0.75rem;
+    text-shadow: 1px 1px 2px color.get(root-shadow-neg);
   }
 </style>

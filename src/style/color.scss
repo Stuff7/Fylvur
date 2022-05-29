@@ -49,6 +49,7 @@ $color-vars: (
   teal: #008080,
   vanilla: #F3E5AB,
   vegas-gold: #C4B454,
+  white: #FFFFFF,
 );
 
 $themes: (
@@ -60,6 +61,7 @@ $themes: (
     navbar-bg: map.get($color-vars, matte-black),
     root-bg: map.get($color-vars, medium-grey),
     root-shadow: map.get($color-vars, black),
+    root-shadow-neg: map.get($color-vars, black),
     root-text-color: map.get($color-vars, platinum),
     text-color-01: map.get($color-vars, vanilla),
   ),
@@ -71,6 +73,7 @@ $themes: (
     navbar-bg: map.get($color-vars, light-brown),
     root-bg: map.get($color-vars, platinum),
     root-shadow: map.get($color-vars, onyx),
+    root-shadow-neg: map.get($color-vars, white),
     root-text-color: map.get($color-vars, onyx),
     text-color-01: map.get($color-vars, jet-black),
   ),

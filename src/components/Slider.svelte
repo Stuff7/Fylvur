@@ -8,6 +8,7 @@
   export let width = '2em';
   export let value = 0;
   export let stepIndicators = false;
+  export let thumbRadius = '0.5em';
 
   $: length = max - min;
   $: rangePercentage = (value - min) * 100 / length;
@@ -17,7 +18,11 @@
 
 <div
   class="Slider"
-  style={genCssVars({ rangePercentage: `${rangePercentage}%`, width })}
+  style={genCssVars({
+    rangePercentage: `${rangePercentage}%`,
+    thumbRadius,
+    width,
+  })}
 >
   <input
     class="Slider__input"
@@ -40,6 +45,16 @@
 <style lang="scss">
   @use '../style/color';
   @use '../style/misc';
+
+  @include misc.input-range-track((
+    min-height: 1rem,
+    background: transparent,
+  ));
+
+  @include misc.input-range-thumb((
+    min-width: 1.25rem,
+    min-height: 1.25rem,
+  ));
 
   .Slider {
     display: flex;
@@ -75,7 +90,7 @@
     &:after {
       content: "";
       position: absolute;
-      @include misc.circle(0.5em);
+      @include misc.circle(var(--thumbRadius));
       @include misc.shadow();
       background: color.get(folder-bg);
       left: var(--rangePercentage);
