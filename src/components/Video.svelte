@@ -95,14 +95,12 @@
       on:click={togglePlay}
       on:dblclick={fullscreen}
     />
-    {#if video}
-      <Slider
-        max={duration}
-        thumbRadius="0.35em"
-        width="100%"
-        bind:value={video.currentTime}
-      />
-    {/if}
+    <Slider
+      max={duration}
+      thumbRadius="0.35em"
+      width="100%"
+      bind:value={currentTime}
+    />
     <div class="Video__controls-bottom">
       <button class="Video__button" on:click={togglePlay}>
         <Play {paused} />
