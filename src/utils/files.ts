@@ -98,12 +98,6 @@ export async function screenshotVideo(
     const pass = new PassThrough();
     const video = FFMPEG(videoPath).output(pass, { end: true });
 
-    videoThumbnailPreset(videoPath, {
-      isGif,
-      progress,
-      width,
-    }).then(preset => video.preset(preset).run());
-
     pass.on('data', chunk => {
       buff.push(chunk);
     });
@@ -115,5 +109,11 @@ export async function screenshotVideo(
     video.on('error', (err) => {
       console.error(`Error getting thumbnail for "${videoPath}"\nDetails:\n`, err);
     });
+
+    videoThumbnailPreset(videoPath, {
+      isGif,
+      progress,
+      width,
+    }).then(preset => video.preset(preset).run());
   });
 }

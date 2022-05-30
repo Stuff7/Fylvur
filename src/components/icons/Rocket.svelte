@@ -17,13 +17,13 @@
   </div>
   <div class="Rocket__window-big"></div>
   <div class="Rocket__window-small"></div>
-  {#each range4 as i}
+  {#each range4 as i (`Rocket__fire-${i}`)}
   <div class="Rocket__fire-{i}" />
   {/each}
-  {#each range4 as i}
+  {#each range4 as i (`Rocket__spark-${i}`)}
   <div class="Rocket__spark-{i}" />
   {/each}
-  {#each range16 as i}
+  {#each range16 as i (`Rocket__star--${i}`)}
   <div class="Rocket__star Rocket__star--{i}" />
   {/each}
 </div>

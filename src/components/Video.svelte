@@ -13,6 +13,7 @@
 
   onMount(() => {
     isSafari = checkIfSafari();
+    isFirefox = navigator.userAgent.indexOf('Firefox') > 0;
     if (isSafari) {
       video.addEventListener('webkitendfullscreen', handleEndFullscreen);
     }
@@ -25,6 +26,7 @@
     }
   });
 
+  let isFirefox = false;
   let isSafari = false;
   let video: HTMLVideoElement;
   let currentTime = 0;
@@ -58,14 +60,30 @@
     loop = !loop;
   }
 
+  function progressBarListener({ target }: Event) {
+    if (isFirefox) {
+      video.currentTime = parseFloat((target as HTMLInputElement).value);
+    }
+  }
+
   function keyboardControl({ detail: key }: CustomEvent<string>) {
     showControls();
     switch (key) {
-      case 'ArrowLeft':
-        // Using the binded currentTime variable doesn't work on Firefox
-        video.currentTime = Math.max(currentTime - 10, 0); break;
-      case 'ArrowRight':
-        video.currentTime = Math.min(currentTime + 10, duration); break;
+      case 'ArrowLeft': {
+        const nextDuration = Math.max(currentTime - 10, 0);
+        // Changing binded currentTime while video is playing doesn't work on Firefox
+        if (isFirefox) {
+          video.currentTime = nextDuration; break;
+        }
+        currentTime = nextDuration; break;
+      }
+      case 'ArrowRight': {
+        const nextDuration = Math.min(currentTime + 10, duration);
+        if (isFirefox) {
+          video.currentTime = nextDuration; break;
+        }
+        currentTime = nextDuration; break;
+      }
       case 'Space':
         togglePlay(); break;
       case 'KeyF':
@@ -100,6 +118,7 @@
       thumbRadius="0.35em"
       width="100%"
       bind:value={currentTime}
+      on:change={progressBarListener}
     />
     <div class="Video__controls-bottom">
       <button class="Video__button" on:click={togglePlay}>

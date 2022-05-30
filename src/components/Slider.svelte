@@ -31,9 +31,10 @@
     {max}
     {step}
     bind:value
+    on:change
   />
   <div class="Slider__track">
-    {#each steps as stepPos}
+    {#each steps as stepPos (`Slider__step--${stepPos}`)}
       <div
         class="Slider__step-indicator"
         style={genCssVars({ stepPos: `${stepPos}%` })}

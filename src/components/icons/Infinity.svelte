@@ -12,7 +12,7 @@ S86.2,38.6,93.9,46.4z';
 
 <svg class="Infinity" viewBox="46.38 24.27 95.53 48.05" preserveAspectRatio="xMidyMid">
   <path class="Infinity__outline" d={tracePath} />
-  {#each range6 as i}
+  {#each range6 as i (`Infinity__tracer--${i}`)}
     <path
       class="Infinity__tracer Infinity__tracer--{i} {animated ? 'animated' : ''}"
       d={tracePath}

@@ -3,7 +3,7 @@
 </script>
 
 <div class="Console">
-  {#each $debugStore.consoleLogs as log}
+  {#each $debugStore.consoleLogs as log, i (`Console__log--${i}`)}
     <pre class="Console__log" id="debug-console">{log}</pre>
   {/each}
 </div>

@@ -26,7 +26,7 @@
   <div class="Explorer__nav">
     <p class="Explorer__history">
       {#if folderHistory.length > 1}
-        {#each folderHistory as folderItem}
+        {#each folderHistory as folderItem (`Explorer__history--${folderItem.href}`)}
           {#if folderItem.href}
             <a href={folderItem.href}>{folderItem.name}</a>
           {:else}
@@ -50,7 +50,7 @@
     </div>
   </div>
   <div class="Explorer__list">
-    {#each files as file, i }
+    {#each files as file (`Explorer__list--${file.href}`) }
       {#if file.isFolder}
         <Folder
           href="/{file.href}"
