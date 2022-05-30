@@ -34,7 +34,7 @@
     on:change
   />
   <div class="Slider__track">
-    {#each steps as stepPos (`Slider__step--${stepPos}`)}
+    {#each steps as stepPos (`Slider__step-indicator--${stepPos}`)}
       <div
         class="Slider__step-indicator"
         style={genCssVars({ stepPos: `${stepPos}%` })}
