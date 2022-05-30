@@ -9,7 +9,7 @@ export const MEDIA_FOLDER = import.meta.env.FYLVUR_MEDIA_FOLDER;
 
 export async function getFiles(dir: string) {
   const files = await readdir(dir, { withFileTypes: true });
-  return await Promise.all(files.map(async (file) => {
+  const fileList = await Promise.all(files.map(async (file) => {
     const absFile = resolve(dir, file.name);
 
     return {
@@ -18,6 +18,7 @@ export async function getFiles(dir: string) {
       name: file.name,
     } as FileInfo;
   }));
+  return fileList.sort((a, b) => (b.isFolder ? 1 : 0) - (a.isFolder ? 1 : 0));
 }
 
 export async function getFileDetails(dir: string) {

@@ -7,12 +7,10 @@
   export let width = '3rem';
   let checked: boolean;
 
-  function changeTheme(this: HTMLInputElement) {
-    $preferences.theme = this.checked ? 'dark' : 'light';
-  }
+  preferences.subscribe(({ theme }) => checked = theme === 'dark');
 
   $: if (preferences) {
-    checked = $preferences.theme === 'dark';
+    $preferences.theme = checked ? 'dark' : 'light';
   }
 </script>
 
@@ -20,8 +18,7 @@
   <input
     class="ThemeToggle__toggle-checkbox"
     type="checkbox"
-    {checked}
-    on:change={changeTheme}
+    bind:checked
   />
   <div class="ThemeToggle__toggle-slot">
     <div class="ThemeToggle__sun-icon-wrapper">

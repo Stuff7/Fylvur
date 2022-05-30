@@ -3,6 +3,7 @@
   import Folder from 'components/Folder.svelte';
   import Slider from 'components/Slider.svelte';
   import preferences from 'store/preferences';
+import { genCssVars } from 'utils/dom';
 
   export let files: FileInfo[] = [];
   export let folder = '';
@@ -22,7 +23,7 @@
   <title>Fylvur{currentFolder ? ` - ${currentFolder}` : ''}</title>
 </svelte:head>
 
-<section class="Explorer">
+<section class="Explorer" style={genCssVars({ itemSize: `${itemSize}px` })}>
   <div class="Explorer__nav">
     <p class="Explorer__history">
       {#if folderHistory.length > 1}
@@ -122,10 +123,10 @@
   }
 
   .Explorer__list {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, var(--itemSize));
+    grid-gap: 1rem;
     justify-content: center;
-    flex: 1;
+    align-items: center;
   }
 </style>
