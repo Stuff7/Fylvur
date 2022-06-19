@@ -1,8 +1,8 @@
 import type { Handle } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit/types/private';
 import { fileTypeFromFile, type FileTypeResult } from 'file-type';
-import { MEDIA_FOLDER, screenshotVideo } from 'utils/files';
-import { createReadStream, statSync } from 'fs';
+import { CACHE_FOLDER, MEDIA_FOLDER, screenshotVideo } from 'utils/files';
+import { createReadStream, existsSync, statSync } from 'fs';
 import path from 'path';
 import sharp from 'sharp';
 
@@ -11,7 +11,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     const { request } = event;
     const file = event.url.pathname.replace('/file/', '');
     const filePath = decodeURIComponent(path.resolve(MEDIA_FOLDER, file));
-    const media = await getMedia(request, filePath, getSearchParams(event));
+    const media = await getMedia(request, filePath, file, getSearchParams(event));
     const res = new Response(media.body, {
       headers: media.headers,
       status: media.status,
@@ -33,7 +33,22 @@ function getSearchParams(event: RequestEvent) {
     event.url.searchParams;
 }
 
-async function getMedia(req: Request, file: string, searchParams: URLSearchParams) {
+async function scaleImage(file: string, w: number, mime: string) {
+  const image = await sharp(file);
+  const scaledImage = await (
+    w ? image.resize(w) : image
+  ).rotate().toBuffer().catch(() => (
+    createReadStream(file) as unknown as ReadableStream
+  ));
+
+  return {
+    body: scaledImage,
+    headers: { 'Content-Type': mime },
+    status: 200,
+  };
+}
+
+async function getMedia(req: Request, file: string, relFile: string, searchParams: URLSearchParams) {
   const range = req.headers.get('range');
   const fileType = await fileTypeFromFile(
     file,
@@ -41,15 +56,31 @@ async function getMedia(req: Request, file: string, searchParams: URLSearchParam
   const headers = {
     'Content-Type': fileType.mime,
   };
+  const thumbnailImg = searchParams.has('tn-img') || '';
+  const imgWidth = Number(searchParams.get('img-width'));
 
-  const thumbnailWidth = searchParams.get('tn-width') || '';
+  if (thumbnailImg) {
+    const cacheFile = path.resolve(CACHE_FOLDER, `${relFile}.webp`);
+    const cacheExists = existsSync(cacheFile);
+    if (cacheExists) {
+      return await scaleImage(cacheFile, imgWidth, 'image/webp');
+    }
+  }
+
   const thumbnailProgress = searchParams.get('tn-progress') || '';
   const thumbnailGif = searchParams.has('tn-gif');
-  if (thumbnailWidth || thumbnailProgress || thumbnailGif) {
-    const width = parseInt(thumbnailWidth) || 0;
-    const thumbnail = await screenshotVideo(file, thumbnailProgress, width, thumbnailGif);
+  if (thumbnailProgress || thumbnailGif) {
+    const width = imgWidth || 500;
+    const thumbnail = await screenshotVideo(
+      file,
+      relFile,
+      thumbnailProgress,
+      width,
+      thumbnailGif,
+    );
 
-    return {
+    return typeof thumbnail === 'string' ?
+      await scaleImage(thumbnail, imgWidth, 'image/webp') : {
       body: thumbnail,
       headers: {
         'Content-Type': 'image/webp',
@@ -86,19 +117,7 @@ async function getMedia(req: Request, file: string, searchParams: URLSearchParam
 
   // Image
   if (fileType.mime.includes('image')) {
-    const w = Number(searchParams.get('width'));
-    const image = await sharp(file);
-    const scaledImage = await (
-      w ? image.resize(w) : image
-    ).rotate().toBuffer().catch(() => (
-      createReadStream(file) as unknown as ReadableStream
-    ));
-
-    return {
-      body: scaledImage,
-      headers,
-      status: 200,
-    };
+    return await scaleImage(file, imgWidth, fileType.mime);
   }
 
   const readable = createReadStream(file) as unknown as ReadableStream;

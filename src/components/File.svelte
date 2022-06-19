@@ -23,8 +23,8 @@
   function playPreview() {
     if (thumbnailChangeInterval === -1) {
       thumbnailChangeInterval = window.setInterval(() => (
-        thumbnailTime = (thumbnailTime + 2) % videoDuration
-      ), 2e3);
+        thumbnailTime = (thumbnailTime + 10) % videoDuration
+      ), 1500);
     }
   }
 
@@ -48,10 +48,10 @@
   on:hoverend={stopPreview}
 >
   {#if details.type === 'image'}
-    <img src="/file/{href}?width={thumbnailSize}" alt={name} />
+    <img src="/file/{href}?img-width={thumbnailSize}" alt={name} />
   {:else if details.type === 'video'}
     <img
-      src="/file/{href}?tn-width={thumbnailSize}&tn-progress={thumbnailTime || encodeURI('50%')}{previewing ? '&tn-gif' : ''}"
+      src="/file/{href}?tn-progress={thumbnailTime || encodeURI('50%')}&tn-{previewing ? 'gif' : 'img'}"
       alt={name}
     />
     <div class="File__video-overlay">

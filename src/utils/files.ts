@@ -1,19 +1,47 @@
+import path from 'path';
+import FFMPEG from 'fluent-ffmpeg';
+import fs from 'fs';
+import { PassThrough } from 'stream';
 import { readdir, stat } from 'fs/promises';
 import { fileTypeFromFile } from 'file-type';
-import { relative, resolve } from 'path';
-import { PassThrough } from 'stream';
-import FFMPEG from 'fluent-ffmpeg';
 import { clamp } from 'utils/math';
 
 export const MEDIA_FOLDER = import.meta.env.FYLVUR_MEDIA_FOLDER;
+export const CACHE_FOLDER = path.resolve(MEDIA_FOLDER, '.fylvur-cache');
+export const FILE_CACHE_PATH = path.resolve(createNestedFolder(CACHE_FOLDER), 'file-details.json');
+
+const FILE_CACHE = readJSON(FILE_CACHE_PATH, {} as Record<string, FileDetails>);
+
+export function readJSON<T>(file: string, fallback?: T) {
+  try {
+    return JSON.parse(fs.readFileSync(file, 'utf8')) as T;
+  } catch(err) {
+    if (fallback) {
+      writeJSON(file, fallback);
+      return fallback;
+    }
+    throw err;
+  }
+}
+
+export function writeJSON<T>(file: string, obj: T) {
+  fs.writeFileSync(file, JSON.stringify(obj), 'utf8');
+}
+
+export function createNestedFolder(folder: string) {
+  if (!fs.existsSync(folder)) {
+    fs.mkdirSync(folder, { recursive: true });
+  }
+  return folder;
+}
 
 export async function getFiles(dir: string) {
   const files = await readdir(dir, { withFileTypes: true });
   const fileList = await Promise.all(files.map(async (file) => {
-    const absFile = resolve(dir, file.name);
+    const absFile = path.resolve(dir, file.name);
 
     return {
-      href: relative(MEDIA_FOLDER, absFile).replace(/\\/g, '/'),
+      href: path.relative(MEDIA_FOLDER, absFile).replace(/\\/g, '/'),
       isFolder: file.isDirectory(),
       name: file.name,
     } as FileInfo;
@@ -22,7 +50,11 @@ export async function getFiles(dir: string) {
 }
 
 export async function getFileDetails(dir: string) {
-  const absFile = resolve(dir);
+  const cachedFile = FILE_CACHE[dir];
+  if (cachedFile) {
+    return cachedFile;
+  }
+  const absFile = path.resolve(dir);
   const file = await stat(absFile);
   const info = {} as FileDetails;
 
@@ -38,13 +70,15 @@ export async function getFileDetails(dir: string) {
     info.video = { duration };
   }
 
+  FILE_CACHE[dir] = info;
+  writeJSON(FILE_CACHE_PATH, FILE_CACHE);
   return info;
 }
 
 export async function* getNestedFiles(dir: string): AsyncGenerator<string, void> {
   const dirents = await readdir(dir, { withFileTypes: true });
   for (const dirent of dirents) {
-    const res = resolve(dir, dirent.name);
+    const res = path.resolve(dir, dirent.name);
     if (dirent.isDirectory()) {
       yield* getNestedFiles(res);
     } else {
@@ -90,23 +124,38 @@ async function videoThumbnailPreset(videoPath: string, {
 
 export async function screenshotVideo(
   videoPath: string,
+  relativeVideoPath: string,
   progress = '50%',
   width = 100,
   isGif = false,
 ) {
-  return new Promise<Buffer>(resolve => {
+  return new Promise<Buffer | string>(resolve => {
     const buff: Uint8Array[] = [];
-    const pass = new PassThrough();
-    const video = FFMPEG(videoPath).output(pass, { end: true });
+    const video = FFMPEG(videoPath);
 
-    pass.on('data', chunk => {
-      buff.push(chunk);
-    });
+    let output: PassThrough | string; // Stream if gif, save to disk if image
+    let resolver: () => void;
+    if (isGif) {
+      output = new PassThrough();
+      output.on('data', chunk => {
+        buff.push(chunk);
+      });
+      resolver = () => {
+        const buffer = Buffer.concat(buff);
+        resolve(buffer);
+      };
+    } else {
+      const thumbnailFolder = path.resolve(CACHE_FOLDER, relativeVideoPath, '..');
+      output = path.resolve(CACHE_FOLDER, `${relativeVideoPath}.webp`);
+      createNestedFolder(thumbnailFolder);
+      resolver = () => {
+        resolve(output as string);
+      };
+    }
 
-    video.on('end', () => {
-      const buffer = Buffer.concat(buff);
-      resolve(buffer);
-    });
+    video.output(output, { end: true });
+
+    video.on('end', resolver);
     video.on('error', (err) => {
       console.error(`Error getting thumbnail for "${videoPath}"\nDetails:\n`, err);
     });
