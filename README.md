@@ -26,5 +26,5 @@ You can preview the production build with `yarn preview`.
 To run:
 
 ```bash
-node ./build/index.js
+node build
 ```
