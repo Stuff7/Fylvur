@@ -39,7 +39,7 @@ module.exports = {
     }],
     'no-confusing-arrow': 'off',
     'no-console': ['warn', {
-      allow: ['warn', 'error'],
+      allow: ['warn', 'error', 'info'],
     }],
     'no-continue': ['off'],
     'no-debugger': ['off'],

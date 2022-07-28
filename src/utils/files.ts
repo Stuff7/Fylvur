@@ -1,7 +1,7 @@
 import path from 'path';
 import FFMPEG from 'fluent-ffmpeg';
 import fs from 'fs';
-import { PassThrough } from 'stream';
+import { PassThrough, Readable } from 'stream';
 import { readdir, stat } from 'fs/promises';
 import { fileTypeFromFile } from 'file-type';
 import { clamp } from 'utils/math';
@@ -120,6 +120,34 @@ async function videoThumbnailPreset(videoPath: string, {
     }
     return newCommand;
   };
+}
+
+export async function videoToMP4(file: Readable) {
+  return new Promise<Buffer>((resolve, reject) => {
+    const video = FFMPEG(file);
+    const output = new PassThrough();
+    const buff: Uint8Array[] = [];
+
+    output.on('data', chunk => {
+      buff.push(chunk);
+    });
+
+    video.on('end', () => {
+      const buffer = Buffer.concat(buff);
+      resolve(buffer);
+    });
+
+    video.on('error', (err) => {
+      console.error(`Error transforming video to MP4 "${file}"\nDetails:\n`, err);
+      reject(err);
+    });
+
+    video
+      .outputOptions('-q:v 0')
+      .outputOptions('-f image2pipe')
+      .output(output, { end: true })
+      .run();
+  });
 }
 
 export async function screenshotVideo(
