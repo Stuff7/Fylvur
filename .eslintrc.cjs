@@ -26,11 +26,8 @@ module.exports = {
     'id-blacklist': ['error', 'getDerivedStateFromProps'],
     'import/no-cycle': 'off',
     'import/no-named-as-default': 'off',
-    // TODO: Consider re-enabling when perf improves
     'import/no-named-as-default-member': 'off',
-    // TODO: Consider re-enabling when perf improves
     'import/prefer-default-export': ['off'],
-    // This breaks our custom Link component. If/When we redo the Link component, we can revise this
     'jsx-a11y/anchor-is-valid': ['off'],
     'jsx-a11y/click-events-have-key-events': ['off'],
     'max-len': ['warn', {
